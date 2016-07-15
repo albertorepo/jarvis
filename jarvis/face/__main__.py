@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser
 from time import time
 
@@ -9,46 +10,6 @@ from sklearn.metrics import classification_report, confusion_matrix
 from jarvis.face.imageloader import ImageLoader, Bunch
 
 
-def load_images_from_path(path):
-    return ImageLoader().load_image_from_path(path, min_images_per_folder=15, max_images_per_folder=15)
-
-
-def preprocessing(images, casc_path='cascade.xml'):
-    faces_data = []
-    target = images.target
-    face_cascade = cv2.CascadeClassifier(casc_path)
-    for (ind, img) in enumerate(images.images):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        faces = face_cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-
-        try:
-            (x, y, w, h) = faces[0]
-            area = w * h
-            for (xt, yt, wt, ht) in faces:
-                if wt * ht > area:
-                    (x, y, w, h) = (xt, yt, wt, ht)
-
-        except:
-            print "WARNING - Face not detected"
-            target[ind] = -1
-            continue
-
-        face = gray[y:y + h, x:x + w]
-        faces_data.append(face)
-
-    faces_data = faces_data
-
-    return Bunch(data=faces_data, images=faces_data,
-                 target=images.target[np.where(images.target != -1)],
-                 target_names=images.target_names)
-
 
 def main():
     # TODO: Re-write this
@@ -56,12 +17,13 @@ def main():
     args_parser.add_argument('-p', dest="img_path", help="Path to the images.")
     args = args_parser.parse_args()
 
-    images = load_images_from_path(args.img_path)
-    images = preprocessing(images)
-    X = images.images
+    image_loader = ImageLoader()
+    image_loader.load_images_from_path(args.img_path, min_images_per_folder=10, max_images_per_folder=15)
+    image_loader.preprocessing('cascade.xml')
+    X = image_loader.data.images
 
-    y = images.target
-    target_names = images.target_names
+    y = image_loader.data.target == np.where(image_loader.data.target_names == 'Alberto Castano')[0]
+    target_names = image_loader.data.target_names
     n_classes = target_names.shape[0]
     print("Total dataset size:")
     print("n_classes: %d" % n_classes)
@@ -105,7 +67,7 @@ def main():
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             face = gray[y:y + h, x:x + w]
             face_predicted = recognizer.predict(face)
-            if images.target_names[face_predicted] == 'Alberto Castano':
+            if image_loader.data.target_names[face_predicted] == 'Alberto Castano':
                 print "Bienvenido, amo"
                 print ""
                 exit()
