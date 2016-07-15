@@ -1,3 +1,6 @@
+import json
+import pickle
+
 import cv2
 import numpy as np
 import time
@@ -6,7 +9,15 @@ cascPath = 'cascade.xml'
 faceCascade = cv2.CascadeClassifier(cascPath)
 
 video_capture = cv2.VideoCapture(0)
-last_save = 0
+model_file = open('model.pkl', 'rb')
+clf = pickle.load(model_file)
+
+map_file = open('names_map.json', 'rb')
+names_map = json.loads(map_file.read())
+
+model_file.close()
+map_file.close()
+
 while True:
     # Capture frame-by-frame
     ret, frame = video_capture.read()
@@ -23,18 +34,12 @@ while True:
 
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        if (time.time() - last_save) > 10:
-            try:
-                cv2.imwrite('truth_faces/img_{}.png'.format(time.time()), gray[y:y+h, x:x+w])
-
-                last_save = time.time()
-            except:
-                pass
-
-
-    # Draw a rectangle around the faces
-
-
+        face = gray[y:y + h, x:x + w]
+        face = cv2.resize(face, (168, 168), interpolation=cv2.INTER_CUBIC)
+        face = face.reshape(-1).reshape(1, -1)
+        face_predicted = clf.predict(face)[0]
+        print names_map[str(face_predicted)]
+        print ""
 
     # Display the resulting frame
     cv2.imshow('Video', frame)

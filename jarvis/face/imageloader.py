@@ -10,7 +10,7 @@ class ImageLoader:
     def __init__(self):
         pass
 
-    def load_image_from_path(self, data_folder_path, min_images_per_folder=0):
+    def load_image_from_path(self, data_folder_path, min_images_per_folder=0, max_images_per_folder=10):
         person_names, file_paths = [], []
         for person_name in sorted(listdir(data_folder_path)):
             folder_path = join(data_folder_path, person_name)
@@ -20,8 +20,8 @@ class ImageLoader:
             n_pictures = len(paths)
             if n_pictures >= min_images_per_folder:
                 person_name = person_name.replace('_', ' ')
-                person_names.extend([person_name] * n_pictures)
-                file_paths.extend(paths)
+                person_names.extend([person_name] * max_images_per_folder)
+                file_paths.extend(paths[0:max_images_per_folder])
 
         n_faces = len(file_paths)
         if n_faces == 0:
@@ -35,7 +35,7 @@ class ImageLoader:
         indices = np.arange(n_faces)
         np.random.RandomState(42).shuffle(indices)
         faces, target = images[indices], target[indices]
-        return Bunch(data=images, target=target, target_names=target_names)
+        return Bunch(data=None, images=faces, target=target, target_names=target_names)
 
     def _load_imgs(self, file_paths):
         images = []
@@ -45,10 +45,10 @@ class ImageLoader:
                 print "Loading face #%05d / %05d" % (i + 1, n_faces)
             img = cv2.imread(file_path)
             images.append(img)
-        return np.array(images)
+        return np.asarray(images)
 
 
-class Bunch(collections.namedtuple('Bunch', ['data', 'target', 'target_names'])):
+class Bunch(collections.namedtuple('Bunch', ['data', 'images', 'target', 'target_names'])):
     __slots__ = ()
 
     def __str__(self):

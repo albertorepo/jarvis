@@ -36,6 +36,8 @@ n_features = X.shape[1]
 
 # the label to predict is the id of the person
 y = lfw_people.target
+print(type(y))
+print(y)
 target_names = lfw_people.target_names
 n_classes = target_names.shape[0]
 print(np.where(y == 1))
