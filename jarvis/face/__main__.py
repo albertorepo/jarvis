@@ -105,8 +105,10 @@ def main():
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             face = gray[y:y + h, x:x + w]
             face_predicted = recognizer.predict(face)
-            print images.target_names[face_predicted]
-            print ""
+            if images.target_names[face_predicted] == 'Alberto Castano':
+                print "Bienvenido, amo"
+                print ""
+                exit()
 
         # Display the resulting frame
         cv2.imshow('Video', frame)
