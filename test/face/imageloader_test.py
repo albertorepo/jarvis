@@ -24,10 +24,6 @@ class TestImageLoader():
                       self.image_loader.load_images_from_path, '/Users/albertocastano/development/lfw_funneled',
                       min_images_per_folder=99999999999)
 
-    def test_minimum_cannot_be_grater_than_maximum(self):
-        assert_raises(ValueError, self.image_loader.load_images_from_path,
-                      '/Users/albertocastano/development/lfw_funneled',
-                      min_images_per_folder=10, max_images_per_folder=9)
 
     def test_maximum_number_of_images_too_big(self):
         self.image_loader.load_images_from_path('/Users/albertocastano/development/lfw_funneled',

@@ -12,8 +12,6 @@ class ImageLoader:
         self.data = None
 
     def load_images_from_path(self, data_folder_path, min_images_per_folder=0, max_images_per_folder=np.inf):
-        if max_images_per_folder < min_images_per_folder:
-            raise ValueError("Maximum number of images must be greater or equal o minimum number of images")
         person_names, file_paths = [], []
         for person_name in sorted(listdir(data_folder_path)):
             folder_path = join(data_folder_path, person_name)
@@ -23,9 +21,13 @@ class ImageLoader:
             n_pictures = len(paths)
             if n_pictures >= min_images_per_folder:
                 person_name = person_name.replace('_', ' ')
-                limit = int(np.min([n_pictures, max_images_per_folder]))
-                person_names.extend([person_name] * limit)
-                file_paths.extend(paths[0:limit])
+                if person_name == "Alberto Castano":
+                    person_names.extend([person_name] * n_pictures)
+                    file_paths.extend(paths)
+                else:
+                    limit = int(np.min([n_pictures, max_images_per_folder]))
+                    person_names.extend([person_name] * limit)
+                    file_paths.extend(paths[0:limit])
 
         n_faces = len(file_paths)
         if n_faces == 0:
@@ -61,8 +63,10 @@ class ImageLoader:
             raise AttributeError("Load some images first")
         faces_data = []
         target = self.data.target
+
         face_cascade = cv2.CascadeClassifier(casc_path)
         for (ind, img) in enumerate(self.data.images):
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(
                 img,
                 scaleFactor=1.1,
@@ -86,7 +90,7 @@ class ImageLoader:
             face = img[y:y + h, x:x + w]
             faces_data.append(face)
 
-        self.images = Bunch(images=faces_data,
+        self.data = Bunch(images=faces_data,
                             target=self.data.target[np.where(self.data.target != -1)],
                             target_names=self.data.target_names)
 
@@ -95,4 +99,4 @@ class Bunch(collections.namedtuple('Bunch', ['images', 'target', 'target_names']
     __slots__ = ()
 
     def __str__(self):
-        return "Bunch of {} images ".format(len(self.data))
+        return "Bunch of {} images ".format(len(self.images))
