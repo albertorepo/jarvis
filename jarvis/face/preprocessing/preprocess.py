@@ -2,10 +2,10 @@ import os
 import random
 
 import cv2
+from jarvis.face.preprocessing.aligndlib import AlignDlib
 
-from jarvis.face import utils
-from jarvis.face.imageloader import ImageLoader
-from jarvis.face.aligndlib import AlignDlib
+from jarvis.face.preprocessing import utils
+from jarvis.face.preprocessing.imageloader import ImageLoader
 
 
 def main():
@@ -26,9 +26,11 @@ def align_images_and_save_them(images, output_dir):
     aligner = AlignDlib('./models/dlib/shape_predictor_68_face_landmarks.dat')
 
     n_fallbacks = 0
+    n_images = len(images)
 
-    for image in images:
-        print "=== {} ===".format(image.path)
+    for number, image in enumerate(images):
+        if number % 1000 == 0:
+            print "Aligned {}/{} images".format(number, n_images)
         out_dir = os.path.join(output_dir, image.label)
         utils.mkdir(out_dir)
         outputPrefix = os.path.join(out_dir, image.name)
@@ -37,14 +39,14 @@ def align_images_and_save_them(images, output_dir):
         rgb = image.to_rgb()
         out_rgb = aligner.align(96, rgb, landmarkIndices=landmark_indices)
         if out_rgb is None:
-            print "  + Unable to align."
+            # print image.path
+            # print "  + Unable to align."
             n_fallbacks += 1
             # TODO: Implement fallback
+            out_rgb = rgb
 
-        else:
-            print "  + Aligned."
-            out_bgr = cv2.cvtColor(out_rgb, cv2.COLOR_RGB2BGR)
-            cv2.imwrite(imgName, out_bgr)
+        out_bgr = cv2.cvtColor(out_rgb, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(imgName, out_bgr)
 
     print 'Number of fallbacks: ', n_fallbacks
 

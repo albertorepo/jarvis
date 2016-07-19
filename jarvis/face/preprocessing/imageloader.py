@@ -1,6 +1,6 @@
 import os
 
-from jarvis.face.image import Image
+from jarvis.face.preprocessing.image import Image
 
 
 class ImageLoader:
