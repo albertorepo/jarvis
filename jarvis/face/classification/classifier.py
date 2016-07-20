@@ -7,9 +7,13 @@ from jarvis.face.classification.torch_neural_net import TorchNeuralNet
 from jarvis.face.preprocessing.aligndlib import AlignDlib
 
 
-def get_features(image_path):
-    # TODO: Maybe split this function in two. (Care with efficiency)
+def preprocess_and_get_features(image_path, aligner, net):
+    aligned_face = preprocess(image_path, aligner)
+    features = get_features(aligned_face, net)
+    return features
 
+
+def preprocess(image_path, aligner):
     bgr_image = cv2.imread(image_path)
     if bgr_image is None:
         raise AttributeError("Unable to load image: {}".format(bgr_image))
@@ -18,19 +22,20 @@ def get_features(image_path):
 
     print "  + Original size: {}".format(rgb_image.shape)
 
-    align = AlignDlib('../models/dlib/shape_predictor_68_face_landmarks.dat')
-    bounding_box = align.getLargestFaceBoundingBox(rgb_image)
+    bounding_box = aligner.getLargestFaceBoundingBox(rgb_image)
     if bounding_box is None:
         raise Exception("Unable to find a face: {}".format(image_path))
 
     # TODO: Parametrize size
-    aligned_face = align.align(96, rgb_image, bounding_box, landmarkIndices=AlignDlib.OUTER_EYES_AND_NOSE)
+    aligned_face = aligner.align(96, rgb_image, bounding_box, landmarkIndices=AlignDlib.OUTER_EYES_AND_NOSE)
     if aligned_face is None:
         raise Exception("Unable to align image: {}".format(image_path))
 
-    net = TorchNeuralNet('/Users/albertocastano/development/jarvis/jarvis/face/models/openface/nn4.small2.v1.t7',
-                         imgDim=96, cuda=False)
-    rep = net.forward(aligned_face)
+    return aligned_face
+
+
+def get_features(face, net):
+    rep = net.forward(face)
     return rep
 
 
@@ -42,9 +47,14 @@ def main():
         print "Loading model from {}".format(model_file)
         (label_encoder, clf) = pickle.load(f)
 
+    aligner = AlignDlib('../models/dlib/shape_predictor_68_face_landmarks.dat')
+    net = TorchNeuralNet('/Users/albertocastano/development/jarvis/jarvis/face/models/openface/nn4.small2.v1.t7',
+                         imgDim=96, cuda=False)
+
     for img in images:
         print "Processing: {}".format(img)
-        features = get_features(img).reshape(1, -1)
+
+        features = preprocess_and_get_features(img, aligner, net).reshape(1, -1)
         predictions = clf.predict_proba(features).ravel()
         max_I = np.argmax(predictions)
         person_name = label_encoder.inverse_transform(max_I)

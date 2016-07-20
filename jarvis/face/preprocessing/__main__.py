@@ -2,15 +2,15 @@ import os
 import random
 
 import cv2
-from jarvis.face.preprocessing.aligndlib import AlignDlib
 
 from jarvis.face.preprocessing import utils
+from jarvis.face.preprocessing.aligndlib import AlignDlib
 from jarvis.face.preprocessing.imageloader import ImageLoader
+from jarvis.face.utils import get_config
 
 
 def main():
-    # TODO: Parametrize raw_images_path
-    raw_images_path = '/Users/albertocastano/development/lfw_funneled'
+    raw_images_path = get_config().get('PreProcessing', 'RawImagesPath')
     images = load_images(raw_images_path)
     align_images_and_save_them(images, os.path.join(raw_images_path, '..', 'aligned'))
 
@@ -23,7 +23,7 @@ def load_images(path):
 
 def align_images_and_save_them(images, output_dir):
     landmark_indices = AlignDlib.OUTER_EYES_AND_NOSE
-    aligner = AlignDlib('./models/dlib/shape_predictor_68_face_landmarks.dat')
+    aligner = AlignDlib(get_config().get('PreProcessing', 'FacePredictorPath'))
 
     n_fallbacks = 0
     n_images = len(images)
@@ -35,9 +35,9 @@ def align_images_and_save_them(images, output_dir):
         utils.mkdir(out_dir)
         outputPrefix = os.path.join(out_dir, image.name)
         imgName = outputPrefix + ".png"
-        # TODO: Parametrize the size
         rgb = image.to_rgb()
-        out_rgb = aligner.align(96, rgb, landmarkIndices=landmark_indices)
+        img_dim = get_config().get('PreProcessing', 'FaceSize')
+        out_rgb = aligner.align(int(img_dim), rgb, landmarkIndices=landmark_indices)
         if out_rgb is None:
             # print image.path
             # print "  + Unable to align."
