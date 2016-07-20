@@ -62,8 +62,6 @@ class TorchNeuralNet:
 
         if cuda:
             self.cmd.append('-cuda')
-        print self.cmd
-        # shell = True overcomes the failure, bu iy shouldn be crashing
         self.p = Popen(self.cmd, stdin=PIPE, stdout=PIPE, bufsize=0)
 
         def exitHandler():

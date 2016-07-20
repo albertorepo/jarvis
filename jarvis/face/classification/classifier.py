@@ -2,7 +2,6 @@ import pickle
 
 import cv2
 import numpy as np
-import os
 
 from jarvis.face.classification.torch_neural_net import TorchNeuralNet
 from jarvis.face.preprocessing.aligndlib import AlignDlib
@@ -36,7 +35,7 @@ def get_features(image_path):
 
 
 def main():
-    images = ['/Users/albertocastano/development/lfw_funneled/Alberto_Castano/Alberto_Castano_0001.jpg']
+    images = ['/Users/albertocastano/development/lfw_funneled/George_W_Bush/George_W_Bush_0087.jpg']
 
     model_file = '/Users/albertocastano/development/features/classifier.pkl'
     with open(model_file, 'r') as f:
@@ -45,7 +44,7 @@ def main():
 
     for img in images:
         print "Processing: {}".format(img)
-        features = get_features(img)
+        features = get_features(img).reshape(1, -1)
         predictions = clf.predict_proba(features).ravel()
         max_I = np.argmax(predictions)
         person_name = label_encoder.inverse_transform(max_I)
