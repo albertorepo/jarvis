@@ -62,8 +62,11 @@ class TorchNeuralNet:
 
         if cuda:
             self.cmd.append('-cuda')
-        self.p = Popen(self.cmd, stdin=PIPE, stdout=PIPE, bufsize=0)
-
+        try:
+            self.p = Popen(self.cmd, stdin=PIPE, stdout=PIPE, bufsize=0)
+        except:
+            # TODO: Rewrite this
+            raise Exception("Check your path inside PyCharm, you piece of shiet.")
         def exitHandler():
             if self.p.poll() is None:
                 self.p.kill()
