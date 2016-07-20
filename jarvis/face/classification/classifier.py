@@ -5,6 +5,7 @@ import numpy as np
 
 from jarvis.face.classification.torch_neural_net import TorchNeuralNet
 from jarvis.face.preprocessing.aligndlib import AlignDlib
+from jarvis.face.utils import get_config
 
 
 def preprocess_and_get_features(image_path, aligner, net):
@@ -26,8 +27,8 @@ def preprocess(image_path, aligner):
     if bounding_box is None:
         raise Exception("Unable to find a face: {}".format(image_path))
 
-    # TODO: Parametrize size
-    aligned_face = aligner.align(96, rgb_image, bounding_box, landmarkIndices=AlignDlib.OUTER_EYES_AND_NOSE)
+    img_dim = int(get_config().get('Preprocessing', 'FaceSize'))
+    aligned_face = aligner.align(img_dim, rgb_image, bounding_box, landmarkIndices=AlignDlib.OUTER_EYES_AND_NOSE)
     if aligned_face is None:
         raise Exception("Unable to align image: {}".format(image_path))
 
@@ -39,7 +40,7 @@ def get_features(face, net):
     return rep
 
 
-def main():
+def predict():
     images = ['/Users/albertocastano/development/lfw_funneled/George_W_Bush/George_W_Bush_0087.jpg']
 
     model_file = '/Users/albertocastano/development/features/classifier.pkl'
@@ -61,7 +62,3 @@ def main():
         confidence = predictions[max_I]
 
         print "Predicted {} with {:.2f} confidence".format(person_name, confidence)
-
-
-if __name__ == '__main__':
-    main()

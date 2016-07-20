@@ -6,13 +6,13 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
 
+from jarvis.face.utils import get_config
 
-def main():
-    # TODO: Parametrize this
-    # TODO: Paths as os.join
-    input_dir = '/Users/albertocastano/development/features'
+
+def train():
+    input_dir = get_config().get('Classification', 'TrainingInputPath')
     print "Loading features"
-    file_name = "{}/labels.csv".format(input_dir)
+    file_name = os.path.join(input_dir, 'labels.csv')
     labels = pd.read_csv(file_name, header=None).as_matrix()[:, 1]
     labels = map(itemgetter(1),
                  map(os.path.split,
@@ -21,7 +21,7 @@ def main():
     labels_encoded = label_encoder.transform(labels)
     num_classes = len(label_encoder.classes_)
 
-    file_name = "{}/reps.csv".format(input_dir)
+    file_name = os.path.join(input_dir, 'reps.csv')
     features = pd.read_csv(file_name, header=None).as_matrix()
 
     print "Training for {} classes.".format(num_classes)
@@ -31,11 +31,7 @@ def main():
     # TODO: Try a previous LDA
     clf.fit(features, labels_encoded)
 
-    file_name = "{}/classifier.pkl".format(input_dir)
+    file_name = os.path.join(input_dir, 'classifier.pkl')
     print "Saving classifier to '{}'".format(file_name)
     with open(file_name, 'w') as f:
         pickle.dump((label_encoder, clf), f)
-
-
-if __name__ == '__main__':
-    main()
