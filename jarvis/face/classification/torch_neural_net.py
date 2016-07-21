@@ -67,7 +67,6 @@ class TorchNeuralNet:
         try:
             self.p = Popen(self.cmd, stdin=PIPE, stdout=PIPE, bufsize=0)
         except:
-            # TODO: Rewrite this
             raise Exception("Check your path inside PyCharm, you piece of shiet.")
         def exitHandler():
             if self.p.poll() is None:

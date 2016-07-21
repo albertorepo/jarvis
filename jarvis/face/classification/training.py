@@ -3,11 +3,16 @@ import pickle
 from operator import itemgetter
 
 import pandas as pd
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
 
 from jarvis.face.utils import get_config
 from jarvis.log import init_logger
+
+
+def LDA(n_components):
+    pass
 
 
 class Trainer:
@@ -34,6 +39,14 @@ class Trainer:
         clf = SVC(C=1, kernel='linear', probability=True)
 
         # TODO: Try a previous LDA
+        try:
+            lda = int(get_config().get("Classification", "LDADim"))
+        except ValueError:
+            lda = None
+        if lda:
+            clf_final = clf
+            clf = Pipeline([('lda', LDA(n_components=lda)),
+                            ('clf', clf_final)])
         clf.fit(features, labels_encoded)
 
         file_name = os.path.join(input_dir, 'classifier.pkl')
