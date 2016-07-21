@@ -15,6 +15,7 @@ def get_config():
 
     return config
 
+
 def mkdir(dir):
     assert dir is not None
 
@@ -25,4 +26,3 @@ def mkdir(dir):
             pass
         else:
             raise
-

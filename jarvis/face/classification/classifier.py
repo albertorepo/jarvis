@@ -43,8 +43,14 @@ class Classifier:
         return rep
 
     def predict(self):
+        images = []
+        for i in range(1, 29):
+            if i == 17:
+                continue
+            number = "%02d" % i
+            images.append(
 
-        images = ['/Users/albertocastano/development/lfw_funneled/George_W_Bush/George_W_Bush_0087.jpg']
+                '/Users/albertocastano/development/lfw_funneled/Alberto_Castano/Alberto_Castano_00{}.jpg'.format(number))
 
         model_file = '/Users/albertocastano/development/features/classifier.pkl'
         with open(model_file, 'r') as f:

@@ -36,4 +36,4 @@ class PreProcessor:
             out_bgr = cv2.cvtColor(out_rgb, cv2.COLOR_RGB2BGR)
             cv2.imwrite(imgName, out_bgr)
 
-        self.logger.warning('Number of fallbacks: ', n_fallbacks)
+        self.logger.warning('Number of fallbacks: {}'.format(n_fallbacks))
