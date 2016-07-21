@@ -24,6 +24,8 @@ import sys
 import numpy as np
 import cv2
 
+from jarvis.log import init_logger
+
 myDir = os.path.dirname(os.path.realpath(__file__))
 
 # Workaround for non-standard terminals, originally reported in
@@ -71,6 +73,8 @@ class TorchNeuralNet:
             if self.p.poll() is None:
                 self.p.kill()
         atexit.register(exitHandler)
+
+        self.logger = init_logger(self.__class__.__name__)
 
     def forwardPath(self, imgPath):
         """
@@ -125,7 +129,7 @@ stdout: {}
         except Exception as e:
             self.p.kill()
             stdout, stderr = self.p.communicate()
-            print("""
+            self.logger.error("""
 
 
 Error getting result from Torch subprocess.
