@@ -1,0 +1,8 @@
+[PreProcessing]
+RawImagesPath=/Users/albertocastano/development/lfw_funneled
+FacePredictorPath=/Users/albertocastano/development/jarvis/jarvis/face/models/dlib/shape_predictor_68_face_landmarks.dat
+FaceSize=96
+
+[Classification]
+TrainingInputPath=/Users/albertocastano/development/features
+LDADim=None

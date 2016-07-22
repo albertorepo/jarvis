@@ -2,6 +2,6 @@
 Level=DEBUG
 FileLevel=DEBUG
 StreamLevel=DEBUG
-Path=/home/alberto/development/jarvis/jarvis.log
+Path=/Users/albertocastano/development/jarvis/jarvis.log
 FileMaxBytes=1048576
 FileCount=10

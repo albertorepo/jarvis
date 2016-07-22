@@ -1,7 +1,10 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-export PYTHONPATH=$PYTHONPATH:/Users/albertocastano/development/jarvis
+set -o errexit
 
-python preprocessing/__main__.py
-luajit featureextraction/main.lua
+export PYTHONPATH=$PYTHONPATH:"$(pwd)/../.."
+echo $PYTHONPATH
+
+#python preprocessing/__main__.py
+luajit featureextraction/main.lua -outDir /home/alberto/development/features -data /home/alberto/development/aligned
 python classification/__main__.py train
