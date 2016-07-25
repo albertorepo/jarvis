@@ -40,7 +40,7 @@ def _get_features(face, net):
 
 
 def main():
-    cap = cv2.VideoCapture(0)
+
     model_file = get_config().get("Classification", "ModelPath")
     with open(model_file, 'r') as f:
         print "Loading model from {}".format(model_file)
@@ -50,6 +50,7 @@ def main():
     net = TorchNeuralNet(get_config().get("Classification", "NetPAth"),
                          imgDim=96, cuda=False)
 
+    cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
 
