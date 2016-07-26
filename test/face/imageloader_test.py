@@ -1,8 +1,6 @@
-import os
-
 from nose.tools import assert_equal, assert_true, assert_raises
 
-from jarvis.face.oldimageloader import ImageLoader
+from jarvis.input.face import ImageLoader
 
 
 class TestImageLoader():
